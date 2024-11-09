@@ -1,39 +1,49 @@
 import { html, render } from 'lit-html';
 import { helloworldicpsimple_backend } from 'declarations/helloworldicpsimple_backend';
-import logo from './logo2.svg';
 
 class App {
-  greeting = '';
-
   constructor() {
     this.#render();
   }
 
-  #handleSubmit = async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    this.greeting = await helloworldicpsimple_backend.greet(name);
-    this.#render();
+  #showNames = async () => {
+    const names = await helloworldicpsimple_backend.submittedNames();
+    document.getElementById('names-list').innerText = names.join(', ');
+  };
+
+  #submitMessage = async () => {
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value;
+    await helloworldicpsimple_backend.submitMessage(message);
+    messageInput.value = '';
+    this.#showMessages();
+  };
+
+  #showMessages = async () => {
+    const messages = await helloworldicpsimple_backend.submittedMessages();
+    document.getElementById('messages-list').innerText = messages.join(', ');
   };
 
   #render() {
     let body = html`
       <main>
-        <img src="${logo}" alt="DFINITY logo" />
+        <h1>🇲🇽 México y 🇹🇭 Tailandia</h1>
         <br />
+        <button id="show-names-btn">Mostrar Nombres Enviados</button>
+        <div id="names-list"></div>
         <br />
-        <form action="#">
-          <label for="name">Enter your name: &nbsp;</label>
-          <input id="name" alt="Name" type="text" />
-          <button type="submit">Click Me!</button>
-        </form>
-        <section id="greeting">${this.greeting}</section>
+        <input type="text" id="message-input" placeholder="Escribe tu mensaje aquí" />
+        <button id="submit-message-btn">Enviar Mensaje</button>
+        <div id="messages-list"></div>
       </main>
     `;
     render(body, document.getElementById('root'));
     document
-      .querySelector('form')
-      .addEventListener('submit', this.#handleSubmit);
+      .getElementById('show-names-btn')
+      .addEventListener('click', this.#showNames);
+    document
+      .getElementById('submit-message-btn')
+      .addEventListener('click', this.#submitMessage);
   }
 }
 
